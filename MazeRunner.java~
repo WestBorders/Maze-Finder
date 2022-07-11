@@ -1,0 +1,169 @@
+package Assignment4;
+
+import BasicIO.*;
+import Media.*;
+import java.lang.Math.*;
+
+public class MazeRunner {
+  
+  private ASCIIDataFile input; //maze input file 
+  private ASCIIOutputFile output; //maze output file
+  
+  private char[][] mazeArray;
+  private int row , col;
+  
+  private int ranRowStart, ranColStart, ranRowEnd, ranColEnd;
+  private int rowStart, colStart, rowEnd, colEnd;
+  
+  public MazeRunner() {
+    
+    input = new ASCIIDataFile();
+    output = new ASCIIOutputFile();
+    
+    row = input.readInt();
+    col = input.readInt();
+    
+    mazeArray = new char[row][col];
+    
+    generateRandom(ranRowStart, ranColStart ,  ranRowEnd,  ranColEnd);
+    readMaze();
+    
+    if(findPath(ranRowStart, ranColStart)){
+      output.newLine();
+      output.writeString("Starting position of Gretel: (" + rowStart + ", " + colStart + ")" );
+      mazeArray[rowStart][colStart] = 'G';
+      output.newLine();
+      output.writeString("Hansel is found at: (" + rowEnd + ", " + colEnd + ")" );
+      output.newLine();
+    }
+    else{
+      output.writeString("No Solution for path");
+    }
+    input.close();
+    printMaze();
+    
+  }//Constructor
+  
+  public void readMaze() {
+    for(int i = 0; i<mazeArray.length; i++) {
+      String t = input.readLine();
+      for(int j = 0; j<mazeArray[i].length; j++) {
+        mazeArray[i][j] = t.charAt(j);
+        findStart(i,j);
+        findEnd(i,j);
+      }
+    }
+    
+  } //readMaze method
+  
+  public void printMaze() {
+    output.newLine();
+    for(int i = 0; i<mazeArray.length; i++) {
+      for(int j = 0; j<mazeArray[i].length; j++) {
+        output.writeC(mazeArray[i][j]);
+      }
+      output.newLine();
+    }
+    
+  }//printMaze method
+  
+  public void generateRandom(int ranRowStart, int ranColStart , int ranRowEnd, int ranColEnd) {
+    
+    ranRowStart = (int) ((row - 2) * Math.random() + 1);
+    ranColStart = (int) ((col - 2) * Math.random() + 1);
+    ranRowEnd = (int) ((row - 2) * Math.random() + 1);
+    ranColEnd = (int) ((col - 2) * Math.random() + 1);
+    
+    if(ranRowStart == ranRowEnd && ranColStart == ranColEnd) {
+      ranRowStart = (int) ((row - 2) * Math.random() + 1);
+      ranColStart = (int) ((col - 2) * Math.random() + 1);
+      ranRowEnd = (int) ((row - 2) * Math.random() + 1);
+      ranColEnd = (int) ((col - 2) * Math.random() + 1);
+    }
+    
+    
+  }//generateRandom Method
+  
+  public void findStart(int x, int y){
+    
+    if(mazeArray[ranRowStart][ranColStart] == '#') {
+      ranRowStart = (int)((row-2) * Math.random() + 1);
+      ranColStart = (int)((col-2) * Math.random() + 1);
+      
+      if(ranRowEnd == ranRowStart && ranColEnd == ranColStart) {
+        findStart(x, y);
+      }
+      if(mazeArray[ranRowStart][ranColStart] == '#'){
+        findStart(x,y);
+      }
+    }
+    else {
+      mazeArray[ranRowStart][ranColStart] = 'G';
+      rowStart = ranRowStart;
+      colStart = ranColStart;
+    }
+    
+  }//findStart Method
+  
+  public void findEnd(int x, int y) {
+    
+    if(mazeArray[ranRowEnd][ranColEnd] == '#'){
+      
+      ranRowEnd = (int)((row-2) * Math.random() + 1);
+      ranColEnd = (int)((col-2) * Math.random() + 1);
+      
+      if(ranRowStart == ranRowEnd && ranColStart == ranColEnd){
+        findEnd(x, y);
+      }
+      if(mazeArray[ranRowEnd][ranColEnd] == '#') {
+        findEnd(x, y);
+      }
+    }
+    else{
+      mazeArray[ranRowEnd][ranColEnd] = 'H';
+      rowEnd = ranRowEnd;
+      colEnd = ranColEnd;
+    }
+    
+  }//findEnd Method
+  
+  public boolean findPath(int x, int y){
+    
+    if(mazeArray[x][y] == 'H') {
+    return true;
+  }
+  if((mazeArray[x][y] != ' ') && mazeArray[x][y] != 'G' || mazeArray[x][y] == '.'){
+    return false;
+  }
+  mazeArray[x][y] = '.';
+  
+  if(findPath(x-1,y)){
+    mazeArray[x][y] = '^';
+    return true;
+  }
+  if(findPath(x,y+1)){
+    mazeArray[x][y] = '>';
+    return true;
+  }
+    if(findPath(x+1,y)){
+    mazeArray[x][y] = 'v';
+    return true;
+  }
+    if(findPath(x,y)){
+      mazeArray[x][y-1] = '<';
+      return true;
+    }
+    return false;
+}
+  
+  public static void main(String[] args) {MazeRunner c = new MazeRunner();}
+}//MazeRunner
+
+
+      
+                         
+  
+  
+  
+  
+    
